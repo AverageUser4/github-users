@@ -1,8 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Column2D, Bar2D, Doughnut2D, Pie2D } from './Charts';
-
-import mockRepos from '../assets/mockData/mockRepos.js';
+import PropTypes from 'prop-types';
 
 function getReposChartDatas(repos) {
   let mostForked = repos.sort((a, b) => b.forks - a.forks).slice(0, 5);
@@ -32,8 +31,8 @@ function getReposChartDatas(repos) {
   return { mostPopular, mostForked, languagesCount, languagesStars };
 }
 
-const Repos = () => {
-  const { mostPopular, mostForked, languagesCount, languagesStars } =  getReposChartDatas(mockRepos);
+const Repos = ({ repos }) => {
+  const { mostPopular, mostForked, languagesCount, languagesStars } =  getReposChartDatas(repos);
 
   return (
     <section className="section">
@@ -45,6 +44,10 @@ const Repos = () => {
       </Wrapper>
     </section>
   );
+};
+
+Repos.propTypes = {
+  repos: PropTypes.array
 };
 
 const Wrapper = styled.div`

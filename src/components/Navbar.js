@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { useAuth0 } from '@auth0/auth0-react';
 
 const Navbar = () => {
-  const { user } = useAuth0();
+  const { user, logout } = useAuth0();
   return (
     <Wrapper>
       <img
@@ -11,7 +11,7 @@ const Navbar = () => {
         alt={user.nickname}
       />
       <h4>Welcome, <strong>{user.nickname}</strong></h4>
-      <button>logout</button>
+      <button onClick={logout}>logout</button>
     </Wrapper>
   );
 };

@@ -1,29 +1,34 @@
 import React from 'react';
 import styled from 'styled-components';
+import PropTypes from 'prop-types';
 
-const Followers = () => {
-  const users = [];
-  for(let i = 0; i < 10; i++) {
-    users.push(
-      <article key={i}>
-        <img
-          src="https://avatars.githubusercontent.com/u/3006?v=4" 
-          alt="tarasis"
-        />
-        <div>
-          <h4>tarasis</h4>
-          <a href="https://github.com/tarasis">https://github.com/tarasis</a>
-        </div>
-      </article>
-    );
-  }
+const Followers = ({ followers }) => {
   return (
     <Wrapper>
       <div className="followers">
-        {users}
+        {
+          followers.map(follower => 
+            <article
+              key={follower.id}
+            >
+              <img
+                src={follower.avatar_url} 
+                alt={follower.login}
+              />
+              <div>
+                <h4>{follower.login}</h4>
+                <a href={follower.html_url}>{follower.html_url}</a>
+              </div>
+            </article>
+          )
+        }
       </div>
     </Wrapper>
   )
+};
+
+Followers.propTypes = {
+  followers: PropTypes.array
 };
 
 const Wrapper = styled.article`

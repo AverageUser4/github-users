@@ -2,16 +2,21 @@ import React from 'react';
 import styled from 'styled-components';
 import { GoRepo, GoGist } from 'react-icons/go';
 import { FiUsers, FiUserPlus } from 'react-icons/fi';
+import PropTypes from 'prop-types';
 
-const UserInfo = () => {
+const UserInfo = ({ user }) => {
   const articles = [];
+  const icons = [<GoRepo key="1"/>, <GoGist key="2"/>, <FiUsers key="3"/>, <FiUserPlus key="4"/>]
+  const properties = ['public_repos', 'public_gists', 'followers', 'following'];
+  const colors = ['pink', 'green', 'purple', 'yellow'];
+
   for(let i = 0; i < 4; i++) {
     articles.push(
       <article key={i} className="item">
-        <span className="pink"><GoRepo/></span>
+        <span className={colors[i]}>{icons[i]}</span>
         <div>
-          <h3>230</h3>
-          <p>repos</p>
+          <h3>{user[properties[i]]}</h3>
+          <p>{properties[i].replace('public_', '')}</p>
         </div>
       </article>
     );
@@ -25,6 +30,15 @@ const UserInfo = () => {
     </section>
   );
 };
+
+UserInfo.propTypes = {
+  user: PropTypes.shape({
+    public_repos: PropTypes.number,
+    public_gists: PropTypes.number,
+    followers: PropTypes.number,
+    following: PropTypes.number
+  })
+}
 
 const Wrapper = styled.section`
   display: grid;

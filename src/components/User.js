@@ -1,17 +1,25 @@
 import React from 'react';
 import styled from 'styled-components';
+import PropTypes from 'prop-types';
 import Card from './Card';
 import Followers from './Followers';
-const User = () => {
+
+
+const User = ({ user, followers }) => {
   return (
     <section className="section">
       <Wrapper className="section-center">
-        <Card/>
-        <Followers/>
+        <Card user={user}/>
+        <Followers followers={followers}/>
       </Wrapper>
     </section>
   );
 };
+
+User.propTypes = {
+  user: PropTypes.object,
+  followers: PropTypes.array
+}
 
 const Wrapper = styled.div`
   padding-top: 2rem;

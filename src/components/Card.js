@@ -1,31 +1,40 @@
 import React from 'react';
 import styled from 'styled-components';
+import PropTypes from 'prop-types';
 import { MdBusiness, MdLocationOn, MdLink } from 'react-icons/md';
-const Card = () => {
+
+const Card = ({ user }) => {
+  const { name, twitter_username, html_url, bio, company, location, blog } = user;
+  
   return (
     <Wrapper>
       <header>
         <img 
           src="https://avatars.githubusercontent.com/u/42133389?v=4"
-          alt="John Smilga"
+          alt={name}
         />
         <div>
-          <h4>John Smilga</h4>
-          <p>@john_smilga</p>
+          <h4>{name}</h4>
+          {twitter_username && <p>@{twitter_username}</p>}
         </div>
-        <a href="https://github.com/john-smilga">follow</a>
+        <a href={html_url}>follow</a>
       </header>
 
-      <p className="bio">Creator of Coding Addict</p>
+      {bio && <p className="bio">{bio}</p>}
 
       <div className="links">
-        <p><MdBusiness/>Coding Addict</p>
-        <p><MdLocationOn/>Sarasota, FL</p>
-        <a href="https://www.johnsmilga.com"><MdLink/>www.johnsmilga.com</a>
+        {company && <p><MdBusiness/>{company}</p>}
+        {location && <p><MdLocationOn/>{location}</p>}
+        {blog && <a href={blog}><MdLink/>{blog}</a>}
       </div>
     </Wrapper>
   );
 };
+
+Card.propTypes = {
+  user: PropTypes.object
+};
+
 const Wrapper = styled.article`
   background: var(--clr-white);
   padding: 1.5rem 2rem;
