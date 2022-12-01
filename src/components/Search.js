@@ -1,27 +1,49 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { MdSearch } from 'react-icons/md';
-import { GithubContext } from '../context/context';
-const Search = () => {
+import PropTypes from 'prop-types';
+
+const Search = ({ setQuery, error, rateLimit = { remaining: 0, limit: 0 } }) => {
+  const [textInput, setTextInput] = useState('');
+  
+  function handleSubmit(event) {
+    event.preventDefault();
+    setQuery(textInput);
+  }
+
   return (
     <section className="section">
       <Wrapper className="section-center">
-        <ErrorWrapper>
-          <p>my error</p>
-        </ErrorWrapper>
-        <form>
+        {
+          error &&
+            <ErrorWrapper>
+              <p>{error}</p>
+            </ErrorWrapper>
+        }
+        <form onSubmit={handleSubmit}>
           <div className="form-control">
             <MdSearch/>
             <input 
-              placeholder="enter github user" 
+              placeholder="enter github user"
+              onChange={(event) => setTextInput(event.target.value)}
+              value={textInput}
             />
             <button>search</button>
           </div>
         </form>
-        <h3>requests : 58 / 60</h3>
+        <h3>requests : {rateLimit.remaining} / {rateLimit.limit}</h3>
       </Wrapper>
     </section>
   );
+};
+
+Search.propTypes = {
+  setQuery: PropTypes.func.isRequired,
+  error: PropTypes.string,
+  rateLimit: PropTypes.shape({
+    remaining: PropTypes.number,
+    limit: PropTypes.number
+  })
 };
 
 const Wrapper = styled.div`
@@ -95,7 +117,6 @@ const Wrapper = styled.div`
 `;
 const ErrorWrapper = styled.article`
   position: absolute;
-  width: 90vw;
   top: 0;
   left: 0;
   transform: translateY(-100%);

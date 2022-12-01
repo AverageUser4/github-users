@@ -17,6 +17,12 @@ function App() {
       <Switch>
 
         <Redirect exact from="/" to={isAuthenticated ? '/dashboard' : '/login'}/>
+        {
+          isAuthenticated ? 
+            <Redirect from="/login" to="/dashboard"/>
+          :
+            <Redirect from="/dashboard" to="/login"/>
+        }
 
         <Route path="/dashboard">
           <Dashboard></Dashboard>
@@ -26,7 +32,7 @@ function App() {
           <Login />
         </Route>
 
-        <Route paht="*">
+        <Route path="*">
           <Error />
         </Route>
 

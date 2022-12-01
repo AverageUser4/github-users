@@ -1,7 +1,6 @@
 module.exports = {
     "env": {
         "browser": true,
-        "node": true,
         "es2021": true
     },
     "extends": [
@@ -17,9 +16,7 @@ module.exports = {
     "plugins": [
         "react"
     ],
-
-
     "rules": {
-      "no-unused-vars": "warn",
+      "no-unused-vars": "warn"
     }
 }
