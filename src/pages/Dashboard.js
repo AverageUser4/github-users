@@ -9,14 +9,18 @@ import mockFollowers from '../assets/mockData/mockFollowers.js';
 import Loading from '../components/Loading';
 
 
-const rootUrl = 'https://api.github.com';
+const initialProfileData = {
+  user: {},
+  followers: [],
+  repos: []
+};
 
 const Dashboard = () => {
   const { isAuthenticated, isLoading } = useAuth0();
   const [query, setQuery] = useState('');
   const [error, setError] = useState('');
-  const [profileData, setProfileData] = useState({});
-  const [isFetching, setIsFetching] = useState();
+  const [profileData, setProfileData] = useState(initialProfileData);
+  const [isFetching, setIsFetching] = useState(false);
 
   useEffect(() => {
     /*
@@ -33,20 +37,47 @@ const Dashboard = () => {
 
       ideally render some components while others have loading animation inside them
     */
-    const ignore = false;
+    let ignore = false;
 
     async function fetchUserData() {
       try {
         setIsFetching(true);
+        setProfileData(initialProfileData);
 
-        const userData = await fetch(`https://api.github.com/users/${query}`);
-        const userJSON = await userData.json();
+        const user = fetch(`https://api.github.com/users/${query}`);
+        const followers = fetch(`https://api.github.com/users/${query}/followers`);
+
+        await user;
+        await followers;
+
+        const userJSON = await user.json();
+        const followersJSON = await followers.json();
+
+        if(ignore)
+          return;
 
         if(userJSON.message)
           throw new Error(userJSON.message);
 
+        const maxPage = Math.ceil(user.public_repos / 100);
+        const repos = [];
+
+        for(let i = 1; i <= maxPage; i++)
+          repos.push(fetch(`https://api.github.com/users/${query}/repos?per_page=100&page=${i}`));
+        for(let i = 1; i <= maxPage; i++)
+          repos[i] = await repos[i];
+
+        const reposJSON = [];
+
+        for(let i = 1; i <= maxPage; i++)
+          reposJSON[i] = await repos[i].json();
+
+        const mergedReposJSON = [...reposJSON];
+
         if(ignore)
           return;
+
+        console.log(userJSON, followersJSON, mergedReposJSON);
 
       } catch(error) {
         console.error(error);
@@ -56,11 +87,11 @@ const Dashboard = () => {
       }
     }
 
-    if(query && !isFetching)
+    if(query)
       fetchUserData();
     
     return () => ignore = true;
-  }, [query, isFetching]);
+  }, [query]);
 
   if(isLoading)
     return <Loading/>
