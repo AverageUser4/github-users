@@ -3,7 +3,28 @@ import { GithubContext } from '../context/context';
 import styled from 'styled-components';
 
 const Followers = () => {
-  return <h2>followers component</h2>;
+  const users = [];
+  for(let i = 0; i < 10; i++) {
+    users.push(
+      <article key={i}>
+        <img
+          src="https://avatars.githubusercontent.com/u/3006?v=4" 
+          alt="tarasis"
+        />
+        <div>
+          <h4>tarasis</h4>
+          <a href="https://github.com/tarasis">https://github.com/tarasis</a>
+        </div>
+      </article>
+    );
+  }
+  return (
+    <Wrapper>
+      <div className="followers">
+        {users}
+      </div>
+    </Wrapper>
+  )
 };
 
 const Wrapper = styled.article`
