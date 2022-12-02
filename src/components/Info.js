@@ -6,7 +6,15 @@ import PropTypes from 'prop-types';
 
 const UserInfo = ({ user }) => {
   if(!user)
-    return null;
+    return (
+      <section>
+        <Wrapper className="section-center">
+          <article className="item">
+            No user data.
+          </article>
+        </Wrapper>
+      </section>
+    );
     
   const articles = [];
   const icons = [<GoRepo key="1"/>, <GoGist key="2"/>, <FiUsers key="3"/>, <FiUserPlus key="4"/>]

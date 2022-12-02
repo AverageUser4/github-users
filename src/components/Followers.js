@@ -3,8 +3,14 @@ import styled from 'styled-components';
 import PropTypes from 'prop-types';
 
 const Followers = ({ followers }) => {
-  if(!followers)
-    return null;
+  if(!followers || !followers.length)
+    return (
+      <Wrapper>
+        <div className="followers">
+          No followers found.
+        </div>
+      </Wrapper>
+    )
     
   return (
     <Wrapper>
@@ -58,9 +64,9 @@ const Wrapper = styled.article`
   }
   .followers {
     overflow: scroll;
-    height: 260px;
+    max-height: 260px;
     display: grid;
-    grid-template-rows: repeat(auto-fill, minmax(45px, 1fr));
+    grid-auto-rows: 45px;
     gap: 1.25rem 1rem;
     padding: 1rem 2rem;
   }

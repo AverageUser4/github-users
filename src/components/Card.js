@@ -5,9 +5,14 @@ import { MdBusiness, MdLocationOn, MdLink } from 'react-icons/md';
 
 const Card = ({ user }) => {
   if(!user)
-    return null;
+    return (
+      <Wrapper>
+        No user data.
+      </Wrapper>
+    );
     
-  const { name, twitter_username, html_url, bio, company, location, blog, avatar_url } = user;
+  let { name, login, twitter_username, html_url, bio, company, location, blog, avatar_url } = user;
+  name = name || login;
   
   return (
     <Wrapper>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Dashboard, Login, PrivateRoute, AuthWrapper, Error } from './pages';
+import { Dashboard, Login, Error } from './pages';
 import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
 import Loading from './components/Loading';

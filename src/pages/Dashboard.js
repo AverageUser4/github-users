@@ -89,12 +89,6 @@ const Dashboard = () => {
         const mergedReposJSON = reposJSON.flat();
         const followersJSON = await followers.json();
 
-        // limit may alternatively be read from x-ratelimit-limit, x-ratelimit-remaining headers
-        // of the latest Response object in repos (date header may be used to get the latest one)
-        // note that the ratelimit wont get updated if fetch fails with current implementation
-        const rateLimit = await fetch('https://api.github.com/rate_limit');
-        const rateLimitJSON = await rateLimit.json();
-
         if(ignore)
           return;
 
@@ -104,6 +98,18 @@ const Dashboard = () => {
           repos: mergedReposJSON
         });
 
+      } catch(error) {
+        console.error(error);
+        setError(error?.toString());
+      } finally {
+        setIsFetching(false);
+
+        try {
+        // limit may alternatively be read from x-ratelimit-limit, x-ratelimit-remaining headers
+        // of the latest Response object in repos (date header may be used to get the latest one)
+        // note that the ratelimit wont get updated if fetch fails with current implementation
+        const rateLimit = await fetch('https://api.github.com/rate_limit');
+        const rateLimitJSON = await rateLimit.json();
         const { limit, remaining } = rateLimitJSON.resources.core;
 
         setRateLimit({
@@ -111,11 +117,9 @@ const Dashboard = () => {
           remaining: remaining || 0
         });
 
-      } catch(error) {
-        console.error(error);
-        setError(error?.toString());
-      } finally {
-        setIsFetching(false);
+        } catch(error) {
+          console.error(error);
+        }
       }
     }
 
@@ -124,6 +128,31 @@ const Dashboard = () => {
     
     return () => ignore = true;
   }, [query]);
+
+  useEffect(() => {
+    let ignore = false;
+
+    (async function fetchRateLimit() {
+      try {
+        const rateLimit = await fetch('https://api.github.com/rate_limit');
+        const rateLimitJSON = await rateLimit.json();
+        const { limit, remaining } = rateLimitJSON.resources.core;
+  
+        if(ignore)
+          return;
+
+        setRateLimit({
+          limit: limit || 0, 
+          remaining: remaining || 0
+        });
+
+      } catch(error) {
+        console.error(error);
+      }
+    })()
+
+    return () => ignore = true;
+  }, []);
 
   if(isLoading)
     return <Loading/>
@@ -142,18 +171,23 @@ const Dashboard = () => {
         rateLimit={rateLimit}
       />
 
-      {isFetching && <Loading/>}
-
-      <Info
-        user={profileData.user}
-      />
-      <User
-        user={profileData.user}
-        followers={profileData.followers}
-      />
-      <Repos
-        repos={profileData.repos}      
-      />
+      {
+        isFetching ? 
+          <Loading/>
+        :
+          <>
+            <Info
+              user={profileData.user}
+            />
+            <User
+              user={profileData.user}
+              followers={profileData.followers}
+            />
+            <Repos
+              repos={profileData.repos}      
+            />
+          </>
+      }
 
     </main>
   );

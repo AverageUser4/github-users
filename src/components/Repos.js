@@ -32,8 +32,14 @@ function getReposChartDatas(repos) {
 }
 
 const Repos = ({ repos }) => {
-  if(!repos)
-    return null;
+  if(!repos || !repos.length)
+    return (
+      <section className="section">
+        <NotFound className="section-center">
+          No repositories found.
+        </NotFound>
+      </section>
+    );
     
   const { mostPopular, mostForked, languagesCount, languagesStars } =  getReposChartDatas(repos);
 
@@ -75,6 +81,11 @@ const Wrapper = styled.div`
     width: 100% !important;
     border-radius: var(--radius) !important;
   }
+`;
+const NotFound = styled.div`
+  background-color: white;
+  padding: 16px;
+  text-align: center;
 `;
 
 export default Repos;
