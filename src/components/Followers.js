@@ -3,6 +3,9 @@ import styled from 'styled-components';
 import PropTypes from 'prop-types';
 
 const Followers = ({ followers }) => {
+  if(!followers)
+    return null;
+    
   return (
     <Wrapper>
       <div className="followers">

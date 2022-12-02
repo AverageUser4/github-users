@@ -5,6 +5,9 @@ import { FiUsers, FiUserPlus } from 'react-icons/fi';
 import PropTypes from 'prop-types';
 
 const UserInfo = ({ user }) => {
+  if(!user)
+    return null;
+    
   const articles = [];
   const icons = [<GoRepo key="1"/>, <GoGist key="2"/>, <FiUsers key="3"/>, <FiUserPlus key="4"/>]
   const properties = ['public_repos', 'public_gists', 'followers', 'following'];

@@ -3,17 +3,19 @@ import { Info, Repos, User, Search, Navbar } from '../components';
 import { useAuth0 } from '@auth0/auth0-react';
 import { Redirect } from 'react-router-dom';
 
-import mockRepos from '../assets/mockData/mockRepos.js';
-import mockUser from '../assets/mockData/mockUser.js';
-import mockFollowers from '../assets/mockData/mockFollowers.js';
 import Loading from '../components/Loading';
 
 
 const initialProfileData = {
-  user: {},
-  followers: [],
-  repos: []
+  user: null,
+  followers: null,
+  repos: null
 };
+
+const initialRateLimit = {
+  limit: 0,
+  remaining: 0
+}
 
 const Dashboard = () => {
   const { isAuthenticated, isLoading } = useAuth0();
@@ -21,6 +23,7 @@ const Dashboard = () => {
   const [error, setError] = useState('');
   const [profileData, setProfileData] = useState(initialProfileData);
   const [isFetching, setIsFetching] = useState(false);
+  const [rateLimit, setRateLimit] = useState(initialRateLimit);
 
   useEffect(() => {
     /*
@@ -43,15 +46,23 @@ const Dashboard = () => {
       try {
         setIsFetching(true);
         setProfileData(initialProfileData);
+        setError('');
 
-        const user = fetch(`https://api.github.com/users/${query}`);
-        const followers = fetch(`https://api.github.com/users/${query}/followers`);
+        const user = await fetch(`https://api.github.com/users/${query}`);
+        const followers = await fetch(`https://api.github.com/users/${query}/followers`);
 
-        await user;
-        await followers;
+        /* testing */
+        // let user, followers;
+        // if(query === 'john') {
+        //   user = await fetch('http://localhost:80/react/public/mockData/mockUser.json');
+        //   followers = await fetch('http://localhost:80/react/public/mockData/mockFollowers.json');
+        // } else {
+        //   user = await fetch('http://localhost:80/react/public/mockData/mockError.json');
+        //   followers = await fetch('http://localhost:80/react/public/mockData/mockError.json');
+        // }
+        /* testing */
 
         const userJSON = await user.json();
-        const followersJSON = await followers.json();
 
         if(ignore)
           return;
@@ -59,25 +70,46 @@ const Dashboard = () => {
         if(userJSON.message)
           throw new Error(userJSON.message);
 
-        const maxPage = Math.ceil(user.public_repos / 100);
+        const maxPage = Math.ceil(userJSON.public_repos / 100);
         const repos = [];
 
-        for(let i = 1; i <= maxPage; i++)
-          repos.push(fetch(`https://api.github.com/users/${query}/repos?per_page=100&page=${i}`));
-        for(let i = 1; i <= maxPage; i++)
+        for(let i = 0; i < maxPage; i++) {
+          repos.push(fetch(`https://api.github.com/users/${query}/repos?per_page=100&page=${i + 1}`));
+          /* testing */
+          // repos[i] = fetch(`http://localhost:80/react/public/mockData/mockRepos${i + 1}.json`);
+        }
+        for(let i = 0; i < maxPage; i++)
           repos[i] = await repos[i];
 
         const reposJSON = [];
 
-        for(let i = 1; i <= maxPage; i++)
+        for(let i = 0; i < maxPage; i++)
           reposJSON[i] = await repos[i].json();
 
-        const mergedReposJSON = [...reposJSON];
+        const mergedReposJSON = reposJSON.flat();
+        const followersJSON = await followers.json();
+
+        // limit may alternatively be read from x-ratelimit-limit, x-ratelimit-remaining headers
+        // of the latest Response object in repos (date header may be used to get the latest one)
+        // note that the ratelimit wont get updated if fetch fails with current implementation
+        const rateLimit = await fetch('https://api.github.com/rate_limit');
+        const rateLimitJSON = await rateLimit.json();
 
         if(ignore)
           return;
 
-        console.log(userJSON, followersJSON, mergedReposJSON);
+        setProfileData({
+          user: userJSON,
+          followers: followersJSON,
+          repos: mergedReposJSON
+        });
+
+        const { limit, remaining } = rateLimitJSON.resources.core;
+
+        setRateLimit({
+          limit: limit || 0, 
+          remaining: remaining || 0
+        });
 
       } catch(error) {
         console.error(error);
@@ -103,19 +135,24 @@ const Dashboard = () => {
     <main>
 
       <Navbar/>
+
       <Search
         setQuery={setQuery}
         error={error}
+        rateLimit={rateLimit}
       />
+
+      {isFetching && <Loading/>}
+
       <Info
-        user={mockUser}
+        user={profileData.user}
       />
       <User
-        user={mockUser}
-        followers={mockFollowers}
+        user={profileData.user}
+        followers={profileData.followers}
       />
       <Repos
-        repos={mockRepos}      
+        repos={profileData.repos}      
       />
 
     </main>

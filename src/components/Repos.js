@@ -32,6 +32,9 @@ function getReposChartDatas(repos) {
 }
 
 const Repos = ({ repos }) => {
+  if(!repos)
+    return null;
+    
   const { mostPopular, mostForked, languagesCount, languagesStars } =  getReposChartDatas(repos);
 
   return (

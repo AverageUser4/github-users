@@ -4,13 +4,16 @@ import PropTypes from 'prop-types';
 import { MdBusiness, MdLocationOn, MdLink } from 'react-icons/md';
 
 const Card = ({ user }) => {
-  const { name, twitter_username, html_url, bio, company, location, blog } = user;
+  if(!user)
+    return null;
+    
+  const { name, twitter_username, html_url, bio, company, location, blog, avatar_url } = user;
   
   return (
     <Wrapper>
       <header>
         <img 
-          src="https://avatars.githubusercontent.com/u/42133389?v=4"
+          src={avatar_url}
           alt={name}
         />
         <div>

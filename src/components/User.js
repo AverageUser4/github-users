@@ -6,6 +6,9 @@ import Followers from './Followers';
 
 
 const User = ({ user, followers }) => {
+  if(!user && !followers)
+    return null;
+
   return (
     <section className="section">
       <Wrapper className="section-center">
