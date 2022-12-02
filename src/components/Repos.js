@@ -51,6 +51,11 @@ const Repos = ({ repos }) => {
         <Doughnut2D chartData={languagesStars}/>
         <Bar2D chartData={mostPopular}/>
       </Wrapper>
+
+      <Disclaimer className="section-center">
+        Note that the data is derived from 100 most recently updated repositories.
+      </Disclaimer>
+
     </section>
   );
 };
@@ -86,6 +91,11 @@ const NotFound = styled.div`
   background-color: white;
   padding: 16px;
   text-align: center;
+`;
+
+const Disclaimer = styled.p`
+  font-size: 14px;
+  margin: 16px auto 0;
 `;
 
 export default Repos;

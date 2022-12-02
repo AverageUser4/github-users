@@ -49,45 +49,16 @@ const Dashboard = () => {
         setError('');
 
         const user = await fetch(`https://api.github.com/users/${query}`);
-        const followers = await fetch(`https://api.github.com/users/${query}/followers`);
-
-        /* testing */
-        // let user, followers;
-        // if(query === 'john') {
-        //   user = await fetch('http://localhost:80/react/public/mockData/mockUser.json');
-        //   followers = await fetch('http://localhost:80/react/public/mockData/mockFollowers.json');
-        // } else {
-        //   user = await fetch('http://localhost:80/react/public/mockData/mockError.json');
-        //   followers = await fetch('http://localhost:80/react/public/mockData/mockError.json');
-        // }
-        /* testing */
-
         const userJSON = await user.json();
-
-        if(ignore)
-          return;
 
         if(userJSON.message)
           throw new Error(userJSON.message);
 
-        const maxPage = Math.ceil(userJSON.public_repos / 100);
-        const repos = [];
+        const followers = await fetch(`https://api.github.com/users/${query}/followers`);
+        const repos = await fetch(`https://api.github.com/users/${query}/repos?per_page=100&sort=updated`);
 
-        for(let i = 0; i < maxPage; i++) {
-          repos.push(fetch(`https://api.github.com/users/${query}/repos?per_page=100&page=${i + 1}`));
-          /* testing */
-          // repos[i] = fetch(`http://localhost:80/react/public/mockData/mockRepos${i + 1}.json`);
-        }
-        for(let i = 0; i < maxPage; i++)
-          repos[i] = await repos[i];
-
-        const reposJSON = [];
-
-        for(let i = 0; i < maxPage; i++)
-          reposJSON[i] = await repos[i].json();
-
-        const mergedReposJSON = reposJSON.flat();
         const followersJSON = await followers.json();
+        const reposJSON = await repos.json();
 
         if(ignore)
           return;
@@ -95,7 +66,7 @@ const Dashboard = () => {
         setProfileData({
           user: userJSON,
           followers: followersJSON,
-          repos: mergedReposJSON
+          repos: reposJSON
         });
 
       } catch(error) {
