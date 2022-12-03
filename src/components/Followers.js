@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 
-const Followers = ({ followers }) => {
+const Followers = ({ followers, allFollowersCount, advanceFollowersPage }) => {  
   if(!followers || !followers.length)
     return (
       <Wrapper>
@@ -10,11 +10,26 @@ const Followers = ({ followers }) => {
           No followers found.
         </div>
       </Wrapper>
-    )
+    );
+
+  const hasMoreFollowers = followers.length < allFollowersCount;
+
+  function handleScroll(event) {
+    const { target } = event;
+    const { scrollTop, scrollTopMax } = target;
+
+    if(scrollTop < scrollTopMax || !hasMoreFollowers)
+      return;
+
+    advanceFollowersPage();
+  }
     
   return (
     <Wrapper>
-      <div className="followers">
+      <div 
+        className="followers"
+        onScroll={(e) => hasMoreFollowers ? handleScroll(e) : ()=>0}
+      >
         {
           followers.map(follower => 
             <article

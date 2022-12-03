@@ -9,7 +9,8 @@ import Loading from '../components/Loading';
 const initialProfileData = {
   user: null,
   followers: null,
-  repos: null
+  repos: null,
+  followersPage: 1
 };
 
 const initialRateLimit = {
@@ -17,29 +18,31 @@ const initialRateLimit = {
   remaining: 0
 }
 
+const FOLLOWERS_PER_PAGE = 30;
+
+function getRateLimit(arrayOfHeaders) {
+  console.log(arrayOfHeaders)
+  let limit = Number(arrayOfHeaders[0].get('x-ratelimit-limit'));
+  let remaining = Number.MAX_SAFE_INTEGER;
+
+  for(let header of arrayOfHeaders)
+    remaining = Math.min(Number(header.get('x-ratelimit-remaining')), remaining);
+
+  return {
+    limit: limit || 0,
+    remaining: remaining || 0
+  };
+}
+
 const Dashboard = () => {
   const { isAuthenticated, isLoading } = useAuth0();
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState('john-smilga');
   const [error, setError] = useState('');
   const [profileData, setProfileData] = useState(initialProfileData);
   const [isFetching, setIsFetching] = useState(false);
   const [rateLimit, setRateLimit] = useState(initialRateLimit);
 
   useEffect(() => {
-    /*
-      - start fetching userData: `https://api.github.com/users/${query}`
-      - start fetching user's followers: `https://api.github.com/users/${query}/followers` (up to 30 objects)
-
-      - throw if either of those returns object with message property (it's empty array if there are no followers)
-
-      - get public_repos from userData then fetch all pages of repos: `https://api.github.com/users/${query}/repos?per_page=100`
-
-      - after all fetches are done: 'https://api.github.com/rate_limit', alternatively read x-ratelimit-remaining and x-ratelimit
-        headers after every fetch and update state ({ remaining: ..., limit: ..., checkedTime: ... }) 
-        if it was the latest fetch (not sure if this check is necessary)
-
-      ideally render some components while others have loading animation inside them
-    */
     let ignore = false;
 
     async function fetchUserData() {
@@ -48,49 +51,35 @@ const Dashboard = () => {
         setProfileData(initialProfileData);
         setError('');
 
-        const user = await fetch(`https://api.github.com/users/${query}`);
-        const userJSON = await user.json();
-
+        const data = await Promise.all([
+          fetch(`https://api.github.com/users/${query}`),
+          fetch(`https://api.github.com/users/${query}/followers`),
+          fetch(`https://api.github.com/users/${query}/repos?per_page=100&sort=updated`),
+        ]);
+ 
+        const dataJSON = await Promise.all(data.map(item => item.json()));
+        const [userJSON, followersJSON, reposJSON] = dataJSON;
+        
         if(userJSON.message)
           throw new Error(userJSON.message);
-
-        const followers = await fetch(`https://api.github.com/users/${query}/followers`);
-        const repos = await fetch(`https://api.github.com/users/${query}/repos?per_page=100&sort=updated`);
-
-        const followersJSON = await followers.json();
-        const reposJSON = await repos.json();
 
         if(ignore)
           return;
 
-        setProfileData({
+        setRateLimit(getRateLimit(data.map(item => item.headers)));
+
+        setProfileData(prev => ({
           user: userJSON,
           followers: followersJSON,
-          repos: reposJSON
-        });
+          repos: reposJSON,
+          followersPage: 1
+        }));
 
       } catch(error) {
         console.error(error);
         setError(error?.toString());
       } finally {
         setIsFetching(false);
-
-        try {
-        // limit may alternatively be read from x-ratelimit-limit, x-ratelimit-remaining headers
-        // of the latest Response object in repos (date header may be used to get the latest one)
-        // note that the ratelimit wont get updated if fetch fails with current implementation
-        const rateLimit = await fetch('https://api.github.com/rate_limit');
-        const rateLimitJSON = await rateLimit.json();
-        const { limit, remaining } = rateLimitJSON.resources.core;
-
-        setRateLimit({
-          limit: limit || 0, 
-          remaining: remaining || 0
-        });
-
-        } catch(error) {
-          console.error(error);
-        }
       }
     }
 
@@ -99,6 +88,49 @@ const Dashboard = () => {
     
     return () => ignore = true;
   }, [query]);
+
+  useEffect(() => {
+    let ignore = false;
+
+    async function fetchMoreFollowers() {
+      try {
+        // currently a couple of request may happen at once which is problematic
+        const followers = fetch(`https://api.github.com/users/${query}/followers?page=${profileData.followersPage}`);
+        const followersJSON = await (await followers).json();
+
+        // data in fetch above is array of Response object, but followers here is Promise object
+
+        if(ignore)
+          return;
+
+        if(!followersJSON[0])
+          throw new Error(`API returned empty array when fetching new followers.
+          This likely means that the 'page' query parameter of request is bigger than expected.
+          Please make sure the App only tries to fetch as many pages as there are. 
+          Number of followers can be accessed in user data. There are 30 followers per page by default`);
+        if(followersJSON.message)
+          throw new Error(followersJSON.message);
+
+
+        setProfileData(prev => ({
+          ...prev,
+          followers: [...prev.followers, ...followersJSON]
+        }));
+
+        const aoh = [followers.headers];
+        console.log(aoh, followers)
+        setRateLimit(getRateLimit(aoh));
+
+      } catch(error) {
+        console.error(error);
+      }
+    }
+
+    if(profileData.followersPage > 1)
+      fetchMoreFollowers();
+
+    return () => ignore = true;
+  }, [profileData.followersPage]);
 
   useEffect(() => {
     let ignore = false;
@@ -124,6 +156,12 @@ const Dashboard = () => {
 
     return () => ignore = true;
   }, []);
+
+  function advanceFollowersPage() {
+    const maxPage = Math.ceil(profileData.user.followers / FOLLOWERS_PER_PAGE);
+    if(profileData.followersPage + 1 <= maxPage)
+      setProfileData(prev => ({ ...prev, followersPage: prev.followersPage + 1 }));
+  }
 
   if(isLoading)
     return <Loading/>
@@ -153,6 +191,7 @@ const Dashboard = () => {
             <User
               user={profileData.user}
               followers={profileData.followers}
+              advanceFollowersPage={advanceFollowersPage}
             />
             <Repos
               repos={profileData.repos}      

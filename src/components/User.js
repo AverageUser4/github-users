@@ -5,12 +5,16 @@ import Card from './Card';
 import Followers from './Followers';
 
 
-const User = ({ user, followers }) => {
+const User = ({ user, followers, advanceFollowersPage }) => {
   return (
     <section className="section">
       <Wrapper className="section-center">
         <Card user={user}/>
-        <Followers followers={followers}/>
+        <Followers 
+          followers={followers}
+          allFollowersCount={user?.followers}
+          advanceFollowersPage={advanceFollowersPage}
+        />
       </Wrapper>
     </section>
   );

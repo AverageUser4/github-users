@@ -25,6 +25,9 @@ export function validateChartData(chartData) {
       if(!Object.hasOwn(data, 'label') || !Object.hasOwn(data, 'value'))
         throw new Error("Each object inside 'chartData' array has to have 'label' and 'value' properties.");
 
+    if(!chartData.find(item => item.value > 0))
+      return false;
+
     return true;
 
   } catch(error) {
