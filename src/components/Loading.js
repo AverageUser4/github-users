@@ -4,6 +4,10 @@ import loadGif from '../images/preloader.gif';
 
 export default function Loading() {
   return (
-    <img src={loadGif} className="loading-img"/>
+    <img 
+      src={loadGif}
+      className="loading-img"
+      alt="Loading..."
+    />
   );
 }
