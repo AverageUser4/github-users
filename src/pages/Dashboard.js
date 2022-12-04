@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Profile, Search, Navbar, Loading } from '../components';
 import { useAuth0 } from '@auth0/auth0-react';
-import { Redirect } from 'react-router-dom';
+import { Redirect, useLocation, useHistory } from 'react-router-dom';
 
 const initialRateLimit = {
   limit: 0,
@@ -9,11 +9,19 @@ const initialRateLimit = {
 };
 
 const Dashboard = () => {
+  const { search } = useLocation();
+  const usp = new URLSearchParams(search);
+  const query = usp.get('user') || '';
+  const { push } = useHistory();
+  
   const { isAuthenticated, isLoading } = useAuth0();
-  const [query, setQuery] = useState('john-smilga');
   const [error, setError] = useState('');
   const [rateLimit, setRateLimit] = useState(initialRateLimit);
 
+  function setQuery(query) {
+    push(`/dashboard?user=${query}`);
+  }
+  
   if(isLoading)
     return <Loading/>
 

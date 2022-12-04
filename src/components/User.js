@@ -12,7 +12,7 @@ const User = ({ user, followers, advanceFollowersPage, setQuery }) => {
         <Card user={user}/>
         <Followers 
           followers={followers}
-          allFollowersCount={user.followers}
+          allFollowersCount={user ? user.followers : 0}
           advanceFollowersPage={advanceFollowersPage}
           setQuery={setQuery}
         />

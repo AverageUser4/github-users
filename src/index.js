@@ -19,6 +19,5 @@ ReactDOM.render(
 
 /*
   TODO:
-    - make use of paths with query parameters when searching for users
     - consider adding windowing to followers list
 */
