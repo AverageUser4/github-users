@@ -12,7 +12,7 @@ const User = ({ user, followers, advanceFollowersPage, setQuery }) => {
         <Card user={user}/>
         <Followers 
           followers={followers}
-          allFollowersCount={user?.followers}
+          allFollowersCount={user.followers}
           advanceFollowersPage={advanceFollowersPage}
           setQuery={setQuery}
         />
@@ -23,7 +23,9 @@ const User = ({ user, followers, advanceFollowersPage, setQuery }) => {
 
 User.propTypes = {
   user: PropTypes.object,
-  followers: PropTypes.array
+  followers: PropTypes.array,
+  advanceFollowersPage: PropTypes.func,
+  setQuery: PropTypes.func
 }
 
 const Wrapper = styled.div`

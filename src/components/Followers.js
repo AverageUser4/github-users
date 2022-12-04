@@ -53,7 +53,10 @@ const Followers = ({ followers, allFollowersCount, advanceFollowersPage, setQuer
 };
 
 Followers.propTypes = {
-  followers: PropTypes.array
+  followers: PropTypes.array,
+  allFollowersCount: PropTypes.number,
+  advanceFollowersPage: PropTypes.func,
+  setQuery: PropTypes.func,
 };
 
 const Wrapper = styled.article`

@@ -47,7 +47,8 @@ Search.propTypes = {
   rateLimit: PropTypes.shape({
     remaining: PropTypes.number,
     limit: PropTypes.number
-  })
+  }),
+  query: PropTypes.string,
 };
 
 const Wrapper = styled.div`

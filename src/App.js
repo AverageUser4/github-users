@@ -26,7 +26,7 @@ function App() {
         }
 
         <Route path="/dashboard">
-          <Dashboard></Dashboard>
+          <Dashboard/>
         </Route>
 
         <Route path="/login">
