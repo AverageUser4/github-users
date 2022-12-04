@@ -17,6 +17,5 @@ module.exports = {
         "react"
     ],
     "rules": {
-      "no-unused-vars": "warn"
     }
 }

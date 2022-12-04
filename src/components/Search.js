@@ -1,11 +1,15 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { MdSearch } from 'react-icons/md';
 import PropTypes from 'prop-types';
 
-const Search = ({ setQuery, error, rateLimit = { remaining: 0, limit: 0 } }) => {
+const Search = ({ query, setQuery, error, rateLimit = { remaining: 0, limit: 0 } }) => {
   const [textInput, setTextInput] = useState('');
   
+  useEffect(() => {
+    setTextInput(query);
+  }, [query]);
+
   function handleSubmit(event) {
     event.preventDefault();
     setQuery(textInput);

@@ -27,12 +27,14 @@ const Dashboard = () => {
 
       <Search
         setQuery={setQuery}
+        query={query}
         error={error}
         rateLimit={rateLimit}
       />
 
       <Profile
         query={query}
+        setQuery={setQuery}
         setError={setError}
         setRateLimit={setRateLimit}
       />

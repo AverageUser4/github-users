@@ -5,7 +5,7 @@ import Card from './Card';
 import Followers from './Followers';
 
 
-const User = ({ user, followers, advanceFollowersPage }) => {
+const User = ({ user, followers, advanceFollowersPage, setQuery }) => {
   return (
     <section className="section">
       <Wrapper className="section-center">
@@ -14,6 +14,7 @@ const User = ({ user, followers, advanceFollowersPage }) => {
           followers={followers}
           allFollowersCount={user?.followers}
           advanceFollowersPage={advanceFollowersPage}
+          setQuery={setQuery}
         />
       </Wrapper>
     </section>

@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 
-const Followers = ({ followers, allFollowersCount, advanceFollowersPage }) => {  
+const Followers = ({ followers, allFollowersCount, advanceFollowersPage, setQuery }) => {  
   if(!followers || !followers.length)
     return (
       <Wrapper>
@@ -38,9 +38,10 @@ const Followers = ({ followers, allFollowersCount, advanceFollowersPage }) => {
               <img
                 src={follower.avatar_url} 
                 alt={follower.login}
+                onClick={() => setQuery(follower.login)}
               />
               <div>
-                <h4>{follower.login}</h4>
+                <h4 onClick={() => setQuery(follower.login)}>{follower.login}</h4>
                 <a href={follower.html_url}>{follower.html_url}</a>
               </div>
             </article>
@@ -98,9 +99,15 @@ const Wrapper = styled.article`
       width: 45px;
       border-radius: 50%;
       object-fit: cover;
+      :hover {
+        cursor: pointer;
+      }
     }
     h4 {
       margin-bottom: 0;
+      :hover {
+        cursor: pointer;
+      }
     }
     a {
       color: var(--clr-grey-5);

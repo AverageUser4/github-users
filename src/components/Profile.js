@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Info, Repos, User } from '../components';
+import PropTypes from 'prop-types';
 
 import Loading from '../components/Loading';
 
@@ -12,7 +13,8 @@ const initialProfileData = {
   followersPage: 1
 };
 
-export default function Profile({ query, setError, setRateLimit }) {
+function Profile({ query, setQuery, setError, setRateLimit }) {
+  console.log('profile rendering....')
   const [profileData, setProfileData] = useState(initialProfileData);
   const [isFetching, setIsFetching] = useState(false);
   const [isFetchingNewFollowers, setIsFetchingNewFollowers] = useState(false);
@@ -148,6 +150,7 @@ export default function Profile({ query, setError, setRateLimit }) {
               user={profileData.user}
               followers={profileData.followers}
               advanceFollowersPage={advanceFollowersPage}
+              setQuery={setQuery}
             />
             <Repos
               repos={profileData.repos}      
@@ -158,3 +161,11 @@ export default function Profile({ query, setError, setRateLimit }) {
   );
 
 }
+
+Profile.propTypes = {
+  query: PropTypes.string,
+  setError: PropTypes.func,
+  setRateLimit: PropTypes.func,
+};
+
+export default Profile;
